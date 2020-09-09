@@ -44,8 +44,8 @@ COPY config/nvidia_icd.json /usr/share/vulkan/icd.d/
 
 # install Isaac SDK
 USER isaac
-COPY isaac-sdk-20200527-0159e2bab.tar.xz /home/$USERNAME/
-COPY isaac_sim_unity3d-20200527-a8205d23.tar.xz /home/$USERNAME/
+COPY isaac-sdk-20200527-0159e2bab.tar.xz /home/$USERNAME/isaac-sdk.tar.xz
+COPY sim_unity3d_release-20200623-18ddf0dd.tar.gz /home/$USERNAME/sim_unity3d.tar.gz
 WORKDIR /home/$USERNAME
 
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && \
@@ -55,15 +55,16 @@ RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.d
     sudo rm -rf /var/lib/apt/lists/*
 
 RUN mkdir isaac_sdk && \
-    tar -xf isaac-sdk-20200527-0159e2bab.tar.xz -C isaac_sdk && \
+    tar -xf isaac-sdk.tar.xz -C isaac_sdk && \
     cd isaac_sdk && \
-    bash engine/build/scripts/install_dependencies.sh && \
-    mkdir -p /home/$USERNAME/isaac_sim_unity3d && \
-    tar -xf /home/$USERNAME/isaac_sim_unity3d-20200527-a8205d23.tar.xz -C /home/$USERNAME/isaac_sim_unity3d
+    bash engine/build/scripts/install_dependencies.sh
+
+RUN mkdir -p /home/$USERNAME/isaac_sim_unity3d && \
+    tar -xf /home/$USERNAME/sim_unity3d.tar.gz -C /home/$USERNAME/isaac_sim_unity3d
 
 USER root
-RUN rm /home/$USERNAME/isaac-sdk-20200527-0159e2bab.tar.xz && \
-    rm /home/$USERNAME/isaac_sim_unity3d-20200527-a8205d23.tar.xz
+RUN rm /home/$USERNAME/isaac-sdk.tar.xz && \
+    rm /home/$USERNAME/sim_unity3d.tar.gz
 
 USER isaac
 RUN echo "export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json" >> ~/.bashrc
